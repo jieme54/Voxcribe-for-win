@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>TranscriptionOverlay</RootNamespace>
+    <AssemblyName>Voxcribe</AssemblyName>
+    <Product>Voxcribe</Product>
+    <Title>Voxcribe</Title>
+    <Version>1.0.0</Version>
+    <ApplicationIcon>Assets\voxtral_icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\voxtral_icon.ico" />
+    <Resource Include="Assets\voxtral_icon.ico" />
+  </ItemGroup>
+</Project>

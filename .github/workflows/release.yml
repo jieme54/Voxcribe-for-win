@@ -1,0 +1,93 @@
+name: Build and release Voxcribe for Windows
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source and tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Read application version
+        id: version
+        shell: pwsh
+        run: |
+          [xml]$project = Get-Content ./src/TranscriptionOverlay/TranscriptionOverlay.csproj -Raw
+          $version = [string]$project.Project.PropertyGroup.Version
+          if ($version -notmatch '^\d+\.\d+\.\d+$') {
+            throw "Set a numeric Version such as 1.0.0 in the project file."
+          }
+          "value=$version" >> $env:GITHUB_OUTPUT
+          "tag=v$version" >> $env:GITHUB_OUTPUT
+
+      - name: Build and verify the portable Windows x64 ZIP
+        shell: pwsh
+        run: ./scripts/package-release.ps1
+
+      - name: Upload downloadable workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Voxcribe-${{ steps.version.outputs.value }}-Windows-x64
+          path: |
+            dist/release-${{ steps.version.outputs.value }}/Voxcribe-Windows-x64.zip
+            dist/release-${{ steps.version.outputs.value }}/SHA256SUMS.txt
+          if-no-files-found: error
+
+      - name: Publish a new version to GitHub Releases
+        if: github.ref == 'refs/heads/main'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          $tag = $env:RELEASE_TAG
+          $version = $env:RELEASE_VERSION
+          $repo = $env:GITHUB_REPOSITORY
+          $json = gh api "repos/$repo/releases?per_page=100" --paginate --slurp
+          if ($LASTEXITCODE -ne 0) { throw "Could not read GitHub Releases." }
+          $existing = @($json | ConvertFrom-Json) | ForEach-Object { $_ } | Where-Object tag_name -eq $tag
+
+          if ($existing -and -not $existing.draft) {
+            Write-Host "$tag is already published. Increment Version to publish another release."
+            exit 0
+          }
+
+          $existingTag = git tag --list $tag
+          if ($existingTag) {
+            $tagCommit = git rev-list -n 1 $tag
+            if ($LASTEXITCODE -ne 0 -or $tagCommit -ne $env:GITHUB_SHA) {
+              throw "$tag points at another commit. Increment Version instead of replacing a release."
+            }
+          }
+
+          if (-not $existing) {
+            gh release create $tag --repo $repo --target $env:GITHUB_SHA --title "Voxcribe $version for Windows" --notes-file ./docs/RELEASE_NOTES.md --draft
+            if ($LASTEXITCODE -ne 0) { throw "Could not create the draft release." }
+          }
+
+          gh release upload $tag --repo $repo "./dist/release-$version/Voxcribe-Windows-x64.zip" "./dist/release-$version/SHA256SUMS.txt" --clobber
+          if ($LASTEXITCODE -ne 0) { throw "Could not upload the release files." }
+
+          gh release edit $tag --repo $repo --draft=false --latest
+          if ($LASTEXITCODE -ne 0) { throw "Could not publish the release." }
