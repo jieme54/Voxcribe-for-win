@@ -1,37 +1,31 @@
 # Voxcribe for Windows
 
-## Démarrage
+## Getting started
 
-1. Extrayez entièrement l'archive ZIP.
-2. Lancez Voxcribe.exe dans le dossier Voxcribe.
-3. Dans les paramètres, installez le moteur NVIDIA, AMD compatible ou CPU.
-4. Téléchargez un modèle, sélectionnez la source audio, puis démarrez.
+1. Extract the complete ZIP archive.
+2. Run `Voxcribe.exe` from the `Voxcribe` folder.
+3. In settings, install a compatible NVIDIA, AMD, or CPU runtime.
+4. Download a model, select your audio source, and start transcribing.
 
-Windows 11 x64 est requis. .NET est inclus dans ce dossier.
-Une connexion Internet est nécessaire pour installer le moteur et les modèles.
-La transcription s'effectue ensuite localement. Les besoins en mémoire et en
-stockage varient selon le modèle ; les téléchargements peuvent être volumineux.
+Requires Windows 11 x64. The .NET runtime is included in this folder.
+Internet access is required to install the Python runtime and download models.
+Transcription then runs locally on your computer. Memory and storage requirements
+vary by model, and runtime and model downloads can be large.
 
-Conservez tous les fichiers de ce dossier avec Voxcribe.exe.
-Les paramètres, moteurs et modèles sont stockés dans %LocalAppData%\Voxcribe.
-Pour mettre à jour, fermez Voxcribe et extrayez la nouvelle version dans un
-autre dossier : vos paramètres et modèles sont conservés.
+Keep every file in this folder alongside `Voxcribe.exe`.
+Settings, runtimes, and models are stored under `%LocalAppData%\Voxcribe`.
 
-## English
+## Updating
 
-Run Voxcribe.exe after extracting the complete ZIP. In settings, install a
-compatible NVIDIA, AMD, or CPU runtime and download a model. Requires Windows
-11 x64. .NET is included. Runtime and model downloads need Internet access;
-transcription runs on your computer. Keep every file next to Voxcribe.exe.
-Settings, runtimes, and models are stored under %LocalAppData%\Voxcribe.
+Close Voxcribe and extract the new release into a separate folder.
+Your settings and downloaded models are stored outside the application folder
+and remain available to the new version.
 
-## Links / Liens
+## Links
 
-Source code and documentation:
-https://github.com/jieme54/Voxcribe-for-win
+- [Source code and documentation](https://github.com/jieme54/Voxcribe-for-win)
+- [Downloads and release notes](https://github.com/jieme54/Voxcribe-for-win/releases)
 
-Downloads:
-https://github.com/jieme54/Voxcribe-for-win/releases
-
-Voxcribe source code: MIT (see LICENSE).
-Third-party dependencies and models: see THIRD_PARTY_NOTICES.md and licenses/.
+Voxcribe's own source code is MIT-licensed; see `LICENSE`.
+Dependencies and model weights retain their own licenses; see
+`THIRD_PARTY_NOTICES.md` and the `licenses` folder.

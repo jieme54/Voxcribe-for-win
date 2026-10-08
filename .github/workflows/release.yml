@@ -53,6 +53,21 @@ jobs:
             dist/release-${{ steps.version.outputs.value }}/SHA256SUMS.txt
           if-no-files-found: error
 
+      - name: Synchronize archived release notes
+        if: github.ref == 'refs/heads/main'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          Get-ChildItem ./docs/releases -Filter '*.md' | ForEach-Object {
+            $tag = $_.BaseName
+            if ($tag -notmatch '^v\d+\.\d+\.\d+$') {
+              throw "Invalid archived release tag: $tag"
+            }
+            gh release edit $tag --repo $env:GITHUB_REPOSITORY --notes-file $_.FullName
+            if ($LASTEXITCODE -ne 0) { throw "Could not update the release notes for $tag." }
+          }
+
       - name: Publish a new version to GitHub Releases
         if: github.ref == 'refs/heads/main'
         shell: pwsh

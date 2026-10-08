@@ -9,14 +9,14 @@ $projectFile = Join-Path $projectRoot "src\TranscriptionOverlay\TranscriptionOve
 $version = [string]$project.Project.PropertyGroup.Version
 
 if ($version -notmatch '^\d+\.\d+\.\d+$') {
-    throw "Le fichier projet doit definir une Version au format 1.0.0."
+    throw "The project file must define a Version in the format 1.0.0."
 }
 
 $releaseRoot = [System.IO.Path]::GetFullPath((Join-Path $projectRoot "dist\release-$version"))
 $packageRoot = [System.IO.Path]::GetFullPath((Join-Path $releaseRoot "Voxcribe"))
 $allowedRoot = [System.IO.Path]::GetFullPath((Join-Path $projectRoot "dist")) + [System.IO.Path]::DirectorySeparatorChar
 if (-not $packageRoot.StartsWith($allowedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
-    throw "Le dossier du package doit rester dans dist."
+    throw "The package directory must remain inside dist."
 }
 
 # This output is isolated from the user's existing Voxcribe application and data.
@@ -48,13 +48,13 @@ foreach ($required in @(
     "licenses\DOTNET-THIRD-PARTY-NOTICES.txt"
 )) {
     if (-not (Test-Path -LiteralPath (Join-Path $packageRoot $required) -PathType Leaf)) {
-        throw "Le package est incomplet : $required"
+        throw "The package is incomplete: $required"
     }
 }
 
 foreach ($forbidden in @("data", "models", "python-runtime", "backend\.venv", "backend\.venv-qwen", "backend\tests")) {
     if (Test-Path -LiteralPath (Join-Path $packageRoot $forbidden)) {
-        throw "Le package public ne doit pas contenir : $forbidden"
+        throw "The public package must not contain: $forbidden"
     }
 }
 

@@ -16,7 +16,7 @@ function Resolve-Python {
 
     if ($ExplicitPythonExe) {
         if (-not (Test-Path $ExplicitPythonExe)) {
-            throw "Python introuvable : $ExplicitPythonExe"
+            throw "Python executable not found: $ExplicitPythonExe"
         }
 
         return @{
@@ -48,7 +48,7 @@ function Resolve-Python {
         }
     }
 
-    throw "Python 3.12 a 3.14 est requis pour le backend Voxtral, ou fournissez -PythonExe."
+    throw "The Voxtral backend requires Python 3.12 to 3.14, or an explicit -PythonExe path."
 }
 
 $projectRoot = Split-Path $PSScriptRoot -Parent
@@ -58,17 +58,17 @@ $qwenVenvRoot = Join-Path $backendRoot ".venv-qwen"
 $pythonInfo = Resolve-Python -ExplicitPythonExe $PythonExe
 
 if ($RecreateVenv -and (Test-Path $venvRoot)) {
-    Write-Host "Recreation du venv Python..."
+    Write-Host "Recreating the Python virtual environment..."
     Remove-Item -Recurse -Force $venvRoot
 }
 
 if ($RecreateVenv -and (Test-Path $qwenVenvRoot)) {
-    Write-Host "Recreation du venv Python Qwen..."
+    Write-Host "Recreating the Qwen Python virtual environment..."
     Remove-Item -Recurse -Force $qwenVenvRoot
 }
 
 if (-not (Test-Path $venvRoot)) {
-    Write-Host "Creation du venv Python..."
+    Write-Host "Creating the Python virtual environment..."
     & $pythonInfo.Exe @($pythonInfo.Args) -m venv $venvRoot
 }
 
@@ -76,17 +76,17 @@ $venvPython = Join-Path $venvRoot "Scripts\python.exe"
 $venvPip = Join-Path $venvRoot "Scripts\pip.exe"
 $requirements = Join-Path $backendRoot "requirements.txt"
 
-Write-Host "Mise a jour de pip..."
+Write-Host "Updating pip..."
 & $venvPython -m pip install --upgrade pip setuptools wheel
 
-Write-Host "Installation de PyTorch CUDA..."
+Write-Host "Installing PyTorch CUDA..."
 & $venvPip install --index-url $TorchIndexUrl --extra-index-url "https://pypi.org/simple" torch torchaudio
 
-Write-Host "Installation des dependances Voxtral..."
+Write-Host "Installing Voxtral dependencies..."
 & $venvPip install -r $requirements
 
 if ($IncludeQwenRuntime) {
-    Write-Host "Creation du runtime Qwen separe..."
+    Write-Host "Creating the separate Qwen runtime..."
     if (-not (Test-Path $qwenVenvRoot)) {
         & $pythonInfo.Exe @($pythonInfo.Args) -m venv $qwenVenvRoot
     }
@@ -99,18 +99,18 @@ if ($IncludeQwenRuntime) {
 }
 
 if ($PreloadModel) {
-    Write-Host "Prechargement du modele $ModelId ..."
+    Write-Host "Preloading model $ModelId ..."
     $code = "from huggingface_hub import snapshot_download; snapshot_download(repo_id=r'$ModelId')"
     & $venvPython -c $code
 }
 
 Write-Host ""
-Write-Host "Backend pret."
+Write-Host "Backend ready."
 Write-Host "Python : $venvPython"
-Write-Host "Modele : $ModelId"
+Write-Host "Model: $ModelId"
 if ($IncludeQwenRuntime) {
-    Write-Host "Runtime Qwen : $(Join-Path $qwenVenvRoot "Scripts\python.exe")"
+    Write-Host "Qwen runtime: $(Join-Path $qwenVenvRoot "Scripts\python.exe")"
 }
 Write-Host ""
-Write-Host "Vous pouvez maintenant lancer l'app avec :"
+Write-Host "You can now launch the application with:"
 Write-Host "dotnet run --project .\src\TranscriptionOverlay\TranscriptionOverlay.csproj"

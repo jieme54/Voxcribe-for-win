@@ -13,7 +13,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 if ($IncludePortablePythonRuntime -and $ExcludePortablePythonRuntime) {
-    throw "Utilisez soit -IncludePortablePythonRuntime, soit -ExcludePortablePythonRuntime, pas les deux."
+    throw "Use either -IncludePortablePythonRuntime or -ExcludePortablePythonRuntime, not both."
 }
 
 $includePortablePythonRuntime = -not $ExcludePortablePythonRuntime `
@@ -29,7 +29,7 @@ function Copy-DirectoryContents {
     )
 
     if (-not (Test-Path $SourceDirectory)) {
-        throw "Source introuvable : $SourceDirectory"
+        throw "Source directory not found: $SourceDirectory"
     }
 
     New-Item -ItemType Directory -Path $DestinationDirectory -Force | Out-Null
@@ -50,7 +50,7 @@ function Resolve-PortablePythonHome {
 
     if ($ExplicitHome) {
         if (-not (Test-Path $ExplicitHome)) {
-            throw "Runtime Python portable introuvable : $ExplicitHome"
+            throw "Portable Python runtime not found: $ExplicitHome"
         }
 
         return $ExplicitHome
@@ -62,7 +62,7 @@ function Resolve-PortablePythonHome {
             return $FallbackHome
         }
 
-        throw "Impossible de retrouver le Python source. pyvenv.cfg introuvable : $pyvenvPath"
+        throw "Cannot locate the source Python installation. pyvenv.cfg not found: $pyvenvPath"
     }
 
     $homeLine = Get-Content $pyvenvPath |
@@ -70,12 +70,12 @@ function Resolve-PortablePythonHome {
         Select-Object -First 1
 
     if (-not $homeLine) {
-        throw "La ligne 'home =' est introuvable dans $pyvenvPath"
+        throw "The 'home =' entry was not found in $pyvenvPath"
     }
 
     $resolvedHome = $homeLine.Substring("home = ".Length).Trim()
     if (-not (Test-Path $resolvedHome)) {
-        throw "Le runtime Python indique dans pyvenv.cfg est introuvable : $resolvedHome"
+        throw "The Python runtime specified in pyvenv.cfg was not found: $resolvedHome"
     }
 
     return $resolvedHome
@@ -96,7 +96,7 @@ function Resolve-SitePackagesSource {
         return $runtimeSitePackages
     }
 
-    throw "Les dépendances Python du backend sont introuvables. Ni $VenvSitePackages ni $runtimeSitePackages n'existent."
+    throw "Python backend dependencies not found. Neither $VenvSitePackages nor $runtimeSitePackages exists."
 }
 
 function Copy-OverlayPackages {
@@ -106,7 +106,7 @@ function Copy-OverlayPackages {
     )
 
     if (-not (Test-Path $SourceSitePackages)) {
-        throw "Source overlay introuvable : $SourceSitePackages"
+        throw "Overlay source directory not found: $SourceSitePackages"
     }
 
     if (Test-Path $DestinationDirectory) {
@@ -392,7 +392,7 @@ else {
 }
 
 if ($LASTEXITCODE -ne 0) {
-    throw "La restauration des dependances .NET a echoue."
+    throw ".NET dependency restore failed."
 }
 
 & "C:\Program Files\dotnet\dotnet.exe" publish $projectFile `
@@ -403,7 +403,7 @@ if ($LASTEXITCODE -ne 0) {
     -o $publishRoot
 
 if ($LASTEXITCODE -ne 0) {
-    throw "La compilation de Voxcribe a echoue. Aucun package ne doit etre publie."
+    throw "The Voxcribe build failed. Do not publish a package from this build."
 }
 
 if (Test-Path $backendSource) {
@@ -425,7 +425,7 @@ if ($includePortablePythonRuntime) {
 
     & (Join-Path $pythonRuntimePublish "python.exe") -m pip install --upgrade --upgrade-strategy only-if-needed $huggingFaceHubRequirement "av>=19.0.1,<20"
     if ($LASTEXITCODE -ne 0) {
-        throw "Impossible d'installer huggingface-hub et le decodeur audio/video PyAV dans le Python portable."
+        throw "Could not install huggingface-hub and the PyAV audio/video decoder in the portable Python runtime."
     }
 
     if ($overlayPackageSource -and (Test-Path $overlayPackageSource)) {
@@ -435,13 +435,13 @@ if ($includePortablePythonRuntime) {
         New-Item -ItemType Directory -Path $voxtralRealtimeOverlayPublish -Force | Out-Null
         & (Join-Path $pythonRuntimePublish "python.exe") -m pip install --upgrade --no-deps --target $voxtralRealtimeOverlayPublish transformers==5.3.0 $huggingFaceHubRequirement
         if ($LASTEXITCODE -ne 0) {
-            throw "Impossible de reconstruire la surcouche Voxtral Realtime."
+            throw "Could not rebuild the Voxtral Realtime overlay."
         }
     }
 
     & (Join-Path $pythonRuntimePublish "python.exe") -m pip install --upgrade --no-deps --target $voxtralRealtimeOverlayPublish $huggingFaceHubRequirement
     if ($LASTEXITCODE -ne 0) {
-        throw "Impossible d'installer une version compatible de huggingface-hub dans la surcouche Voxtral Realtime."
+        throw "Could not install a compatible huggingface-hub version in the Voxtral Realtime overlay."
     }
 
     Prune-PortablePythonRuntime -RuntimeRoot $pythonRuntimePublish
@@ -473,4 +473,4 @@ if (-not $KeepIntermediateBuildOutput) {
 }
 
 Write-Host ""
-Write-Host "Publish pret : $publishRoot"
+Write-Host "Publish output ready: $publishRoot"

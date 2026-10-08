@@ -3,95 +3,96 @@
 [![Windows release](https://github.com/jieme54/Voxcribe-for-win/actions/workflows/release.yml/badge.svg)](https://github.com/jieme54/Voxcribe-for-win/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Voxcribe est une application Windows de transcription vocale locale, avec une
-petite fenêtre toujours visible. Elle transcrit le microphone, le son d'une
-application ou des fichiers audio et vidéo. Interface en français et en anglais.
+Voxcribe is a compact Windows overlay for local speech transcription. Transcribe
+your microphone, other Windows audio sources, or existing audio and video files.
+The application supports English and French interfaces.
 
-## Télécharger l'application
+## Download
 
-**[Télécharger Voxcribe pour Windows x64 (ZIP)](https://github.com/jieme54/Voxcribe-for-win/releases/latest/download/Voxcribe-Windows-x64.zip)**
+**[Download Voxcribe for Windows x64 (ZIP)](https://github.com/jieme54/Voxcribe-for-win/releases/latest/download/Voxcribe-Windows-x64.zip)**
 
-[Voir toutes les versions et les notes de publication](https://github.com/jieme54/Voxcribe-for-win/releases)
- · [Somme de contrôle SHA-256](https://github.com/jieme54/Voxcribe-for-win/releases/latest/download/SHA256SUMS.txt)
+[All releases and release notes](https://github.com/jieme54/Voxcribe-for-win/releases)
+ · [SHA-256 checksum](https://github.com/jieme54/Voxcribe-for-win/releases/latest/download/SHA256SUMS.txt)
 
-1. Téléchargez le ZIP et extrayez-le entièrement dans un dossier.
-2. Ouvrez le dossier `Voxcribe`, puis lancez `Voxcribe.exe`.
-3. Dans les paramètres, installez le moteur adapté à votre PC : NVIDIA, AMD
-   compatible ou CPU. L'option CPU fonctionne aussi sans carte graphique compatible.
-4. Téléchargez un modèle proposé dans les paramètres, puis sélectionnez votre
-   source audio et démarrez la transcription.
+1. Download the ZIP and extract it completely.
+2. Open the `Voxcribe` folder and run `Voxcribe.exe`.
+3. In settings, install the runtime for your PC: NVIDIA, supported AMD, or CPU.
+   The CPU option also works without a compatible graphics card.
+4. Download a model from settings, choose your audio source, and start transcribing.
 
-Le package inclut .NET : aucun SDK ni installation séparée de .NET n'est
-nécessaire. Une connexion Internet est nécessaire pour installer le moteur et
-télécharger les modèles ; la transcription s'effectue ensuite sur votre ordinateur.
-Le moteur et les modèles ne sont pas inclus dans le ZIP et peuvent occuper
-plusieurs gigaoctets.
+The package includes .NET. You do not need the .NET SDK or a separate .NET
+runtime installation. Internet access is required to install the Python runtime
+and download models; transcription then runs locally on your computer.
+Runtimes and models are downloaded separately and may require several gigabytes.
 
-**Configuration :** Windows 11, processeur x64. Les besoins en RAM, VRAM et
-stockage dépendent du modèle. Les modèles et les modes disponibles sont filtrés
-dans l'application ; tous les modèles ne fonctionnent pas sur tous les PC.
-Le ZIP est une version portable de l'application. Les paramètres, moteurs et
-modèles sont conservés dans `%LocalAppData%\Voxcribe`.
+**Requirements:** Windows 11 x64. RAM, VRAM, and storage requirements depend on
+the selected model. Available models and transcription modes are filtered in
+the application; some models require more powerful hardware.
 
-## Code source open source
+Settings, runtimes, and downloaded models are stored under
+`%LocalAppData%\Voxcribe`, outside the portable application folder.
 
-**[Télécharger le code source (ZIP)](https://github.com/jieme54/Voxcribe-for-win/archive/refs/heads/main.zip)**
+## Screenshots
+
+### Compact overlay
+
+The overlay provides recording controls, model status, and quick access to
+settings, transcripts, file import, and the interface language.
+
+![Voxcribe compact overlay in English](docs/images/voxcribe-overlay.png)
+
+### Settings
+
+Choose your audio source, keyboard shortcut, model, transcription mode, and
+hardware acceleration. Transcript window preferences are available here too.
+
+![Voxcribe settings and overlay in English](docs/images/voxcribe-settings.png)
+
+## Features
+
+- Compact, always-on-top overlay with Windows notification area support.
+- Microphone and other Windows audio sources.
+- Standard and real-time transcription, depending on the selected model.
+- Audio and video file import, including drag and drop.
+- Transcript window with selectable text and a copy button.
+- Text insertion into the active application when supported by the selected mode.
+- Global keyboard shortcut and English / French interface options.
+- Runtime installation and model downloads from the settings window.
+
+## Open source
+
+**[Download the source code (ZIP)](https://github.com/jieme54/Voxcribe-for-win/archive/refs/heads/main.zip)**
 
 ```powershell
 git clone https://github.com/jieme54/Voxcribe-for-win.git
 cd Voxcribe-for-win
 ```
 
-Le code de Voxcribe est publié sous [licence MIT](LICENSE).
-Les dépendances et les modèles conservent leurs propres licences :
-voir [les notices](THIRD_PARTY_NOTICES.md). Les poids CrisperWhisper 2.0,
-notamment, sont réservés à la recherche et aux usages non commerciaux sans
-licence distincte de Nyra.
+Voxcribe's source code is released under the [MIT License](LICENSE).
+Dependencies and model weights retain their own licenses; see the
+[third-party notices](THIRD_PARTY_NOTICES.md). In particular, CrisperWhisper 2.0
+weights are restricted to research and non-commercial use unless you obtain
+a separate license from Nyra.
 
-## Fonctions principales
+## Build from source
 
-- Fenêtre compacte toujours au premier plan et réduction dans la zone de notification.
-- Microphone et autres sources audio Windows.
-- Transcription standard et temps réel selon le modèle.
-- Import de fichiers audio ou vidéo, y compris par glisser-déposer.
-- Fenêtre de transcription avec sélection et copie du texte.
-- Insertion du texte dans l'application active lorsque le mode le permet.
-- Raccourci clavier global et interface français / anglais.
-- Installation et téléchargement des moteurs et modèles depuis les paramètres.
-
-## Compiler depuis les sources
-
-Sur Windows, avec le **SDK .NET 8** :
+On Windows, with the **.NET 8 SDK** installed:
 
 ```powershell
 dotnet build .\src\TranscriptionOverlay\TranscriptionOverlay.csproj -c Release
 powershell -ExecutionPolicy Bypass -File .\scripts\package-release.ps1
 ```
 
-Le second appel crée le ZIP dans `dist\release-1.0.0\`, avec son fichier
-`SHA256SUMS.txt`. Python n'est pas nécessaire pour compiler le package léger.
-Pour exécuter le backend en développement, consultez le
-[guide de développement](docs/DEVELOPMENT.md).
+The packaging script creates `Voxcribe-Windows-x64.zip` and `SHA256SUMS.txt`
+under `dist\release-<version>\`. Python is not required to build this lightweight
+package. To run or configure the Python backend during development, see the
+[development guide](docs/DEVELOPMENT.md).
 
-Les sources de l'interface sont dans [src/TranscriptionOverlay](src/TranscriptionOverlay),
-le moteur Python dans [backend](backend), et les scripts de compilation dans
+The Windows interface source is in [src/TranscriptionOverlay](src/TranscriptionOverlay),
+the Python backend is in [backend](backend), and the build scripts are in
 [scripts](scripts).
 
-GitHub Actions compile le projet à chaque publication sur `main` et publie une
-release lorsqu'une nouvelle version est définie dans le fichier projet.
-Une version déjà publiée est conservée : augmentez `<Version>` et mettez à jour
-`docs/RELEASE_NOTES.md` pour publier la suivante. Le workflow peut aussi être
-relancé manuellement.
-
-## English quick start
-
-**[Download Voxcribe for Windows x64](https://github.com/jieme54/Voxcribe-for-win/releases/latest/download/Voxcribe-Windows-x64.zip)**
-
-Extract the complete ZIP, open the `Voxcribe` folder, and run `Voxcribe.exe`.
-In settings, install the NVIDIA, supported AMD, or CPU runtime, then download a
-model. Internet is needed for these downloads; transcription runs locally.
-The ZIP includes .NET, but Python runtimes and model weights are installed
-separately. Requires Windows 11 x64. Hardware requirements depend on the model.
-
-**[Download source code](https://github.com/jieme54/Voxcribe-for-win/archive/refs/heads/main.zip)** ·
-[Development guide](docs/DEVELOPMENT.md) · [MIT license](LICENSE)
+GitHub Actions builds the project on each push to `main` and publishes a release
+when the project defines a new version. Published application assets are kept:
+increment `<Version>` and update `docs/RELEASE_NOTES.md` for the next release.
+The workflow can also be run manually.
